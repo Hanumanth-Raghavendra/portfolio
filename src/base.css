@@ -1,0 +1,270 @@
+/* Layout: dark-first editorial page of full-width bands split by hairlines,
+   with one fracture in the hero that leads to the anime side. */
+:root {
+  /* colour (dark is the base; light mirrors it below) */
+  --bg: #0b0f14;
+  --surface: #0e141b;
+  --surface-2: #121821;
+  --line: #1f2937;
+  --line-2: #2b3645;
+  --fg: #e6edf3;
+  --fg-2: #c4cfda;
+  --muted: #9aa7b4;
+  --accent: #22d3ee;
+  --accent-hover: #67e8f9;
+  --on-accent: #0b0f14;
+  --sakura: #f472b6;
+  --sakura-soft: #fbcfe8;
+  --crack-bg: #1a1220;
+  --crack-core: #f8fafc;
+  --ok: #4ade80;
+  --err: #fca5a5;
+  --page-bg: var(--bg);
+  /* type */
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-anime-display: 'Zen Dots', 'Trebuchet MS', system-ui, sans-serif;
+  --font-anime-body: 'M PLUS Rounded 1c', 'Nunito', system-ui, sans-serif;
+  --font-anime-hud: 'DotGothic16', ui-monospace, monospace;
+  --font-impact: 'Dela Gothic One', Impact, 'Arial Black', sans-serif;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --bg: #f4f6f8;
+    --surface: #ffffff;
+    --surface-2: #ebeff3;
+    --line: #dce2e8;
+    --line-2: #c5cfd9;
+    --fg: #0d141c;
+    --fg-2: #2e3a46;
+    --muted: #56636f;
+    --accent: #0e7490;
+    --accent-hover: #155e75;
+    --on-accent: #ffffff;
+    --sakura: #db2777;
+    --sakura-soft: #9d174d;
+    --crack-bg: #fdf2f8;
+    --crack-core: #831843;
+    --ok: #15803d;
+    --err: #b91c1c;
+    color-scheme: light;
+  }
+}
+
+:root[data-theme='light'] {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #ebeff3;
+  --line: #dce2e8;
+  --line-2: #c5cfd9;
+  --fg: #0d141c;
+  --fg-2: #2e3a46;
+  --muted: #56636f;
+  --accent: #0e7490;
+  --accent-hover: #155e75;
+  --on-accent: #ffffff;
+  --sakura: #db2777;
+  --sakura-soft: #9d174d;
+  --crack-bg: #fdf2f8;
+  --crack-core: #831843;
+  --ok: #15803d;
+  --err: #b91c1c;
+  color-scheme: light;
+}
+
+/* the anime side is one deliberate dusk palette, whatever the theme */
+:root[data-world='anime'] {
+  --page-bg: #1a1033;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  scroll-padding-top: 88px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+html.fx-lock,
+html.fx-lock body {
+  overflow: hidden;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.wrap {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+@media (max-width: 600px) {
+  .wrap {
+    padding-inline: 16px;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.stage {
+  min-height: 100vh;
+}
+
+/* ── toasts ─────────────────────────────────────────── */
+.toasts {
+  position: fixed;
+  z-index: 900;
+  top: calc(env(safe-area-inset-top, 0px) + 84px);
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: calc(100vw - 32px);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  animation: toast-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+.toast-body {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.toasts-pro .toast {
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  color: var(--fg);
+  font-size: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.toasts-pro .toast-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.toasts-anime .toast {
+  border-radius: 12px;
+  background: #1a1033;
+  border: 3px solid #f5b83d;
+  box-shadow: 4px 4px 0 #0e0820;
+  color: #fff7ec;
+  font-family: var(--font-anime-body);
+  font-weight: 800;
+  min-width: 240px;
+}
+
+.toasts-anime .toast-info {
+  border-color: #22d3ee;
+}
+
+.toasts-anime .toast-error,
+.toasts-pro .toast-error {
+  border-color: #f87171;
+}
+
+.toasts-anime .toast-eyebrow {
+  font-family: var(--font-anime-hud);
+  font-weight: 400;
+  font-size: 12px;
+  color: #f5b83d;
+  letter-spacing: 0.06em;
+}
+
+.toast-icon {
+  color: #f5b83d;
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(-8px) scale(0.96);
+    opacity: 0;
+  }
+}
+
+/* ── voice button (shared) ─────────────────────────── */
+.voice-btn {
+  position: relative;
+}
+
+.voice-btn.is-listening::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+  border: 2px solid currentColor;
+  animation: listen 1.2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes listen {
+  from {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

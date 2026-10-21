@@ -1,0 +1,207 @@
+/* ── transition overlay ─────────────────────────────── */
+.fx {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  visibility: hidden;
+  opacity: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+.fx > * {
+  visibility: hidden;
+  opacity: 0;
+}
+.fx > .sr-only {
+  visibility: visible;
+  opacity: 1;
+}
+
+.fx-calm,
+.fx-flash,
+.fx-fall,
+.fx-vhs,
+.fx-classroom {
+  position: absolute;
+  inset: 0;
+}
+
+.fx-flash {
+  background: #fffaf2;
+}
+
+.fx-burst {
+  position: absolute;
+  width: 1000px;
+  height: 1000px;
+  max-width: none;
+}
+
+/* portal disc: sized 120px, GSAP scales it up to cover the screen */
+.fx-portal {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #fffaf2 0 10%, #f9a8d4 18%, #6b2a74 34%, #1a0b1e 58%);
+  box-shadow: 0 0 40px 12px rgba(244, 114, 182, 0.45);
+}
+.fx-portal .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 3px dashed #f472b6;
+}
+.fx-portal .r2 {
+  inset: 14px;
+  border-color: #22d3ee;
+  border-width: 2.5px;
+}
+.fx-portal .r3 {
+  inset: 28px;
+  border-color: #fbcfe8;
+  border-width: 2px;
+}
+.fx.is-active .fx-portal .r1 {
+  animation: spin 0.9s linear infinite;
+}
+.fx.is-active .fx-portal .r2 {
+  animation: spin 0.7s linear infinite reverse;
+}
+.fx.is-active .fx-portal .r3 {
+  animation: spin 0.5s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* free-fall */
+.fx-fall {
+  background: #1a0b1e;
+  overflow: hidden;
+}
+.fall-line {
+  position: absolute;
+  top: 0;
+  border-radius: 2px;
+  background: rgba(255, 247, 236, 0.55);
+  transform: translateY(120vh);
+  animation: rush linear infinite paused;
+}
+.fall-petal {
+  position: absolute;
+  top: 0;
+  width: 11px;
+  height: 7px;
+  border-radius: 60% 0 60% 0;
+  background: #f9a8d4;
+  transform: translateY(120vh);
+  animation: rise linear infinite paused;
+}
+.fx.is-active .fall-line,
+.fx.is-active .fall-petal {
+  animation-play-state: running;
+}
+@keyframes rush {
+  from {
+    transform: translateY(120vh);
+  }
+  to {
+    transform: translateY(-50vh);
+  }
+}
+@keyframes rise {
+  from {
+    transform: translateY(115vh) rotate(0deg);
+  }
+  to {
+    transform: translateY(-10vh) rotate(300deg);
+  }
+}
+
+/* landing impact */
+.fx-impact {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.impact-word {
+  font-family: var(--font-impact);
+  font-size: clamp(64px, 15vw, 190px);
+  line-height: 1;
+  color: #fff7ec;
+  letter-spacing: 0.02em;
+  text-shadow: 5px 5px 0 #1a1033, -2px -2px 0 #f472b6;
+  -webkit-text-stroke: 2px #1a1033;
+}
+.impact-ring {
+  position: absolute;
+  width: min(70vw, 620px);
+  aspect-ratio: 1;
+  max-width: 100%;
+  border-radius: 999px;
+  border: 6px solid rgba(255, 247, 236, 0.6);
+}
+
+/* VHS rewind */
+.fx-vhs {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 2px, transparent 2px 5px),
+    rgba(42, 34, 56, 0.35);
+  mix-blend-mode: normal;
+}
+.vhs-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 9vh;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.22), transparent);
+}
+.vhs-label {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 24px);
+  right: 28px;
+  font-family: var(--font-mono);
+  font-size: clamp(20px, 3vw, 30px);
+  color: #f8fafc;
+  text-shadow: 2px 0 #22d3ee, -2px 0 #f472b6;
+}
+
+/* classroom wake-up */
+.fx-classroom {
+  background: #fff1d6;
+}
+.classroom-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.bubble {
+  position: absolute;
+  right: 56%;
+  top: 22%;
+  transform-origin: 100% 100%;
+  padding: 12px 18px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 3px solid #1a1033;
+  color: #1a1033;
+  font-family: var(--font-anime-body);
+  font-weight: 800;
+  font-size: clamp(16px, 2.4vw, 24px);
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .bubble {
+    right: auto;
+    left: 16px;
+    top: 9%;
+    transform-origin: 0% 100%;
+  }
+}
