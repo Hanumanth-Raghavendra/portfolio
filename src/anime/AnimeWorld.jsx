@@ -18,36 +18,98 @@ import {
   sendMessage,
   unlockAchievement,
 } from '../lib/engine.js';
-import { isSoundOn, onSoundChange, play, setSound } from '../lib/sound.js';
-import Skyline from '../art/Skyline.jsx';
+import { isMuted, onMuteChange, play, setMuted, unlockAudio } from '../lib/sound.js';
+import { isLofiOn, onLofiChange, startLofi, stopLofi } from '../lib/lofi.js';
+import { track } from '../lib/analytics.js';
+import Skyline, { phaseFor, phaseLabel } from '../art/Skyline.jsx';
 import SchoolGuy from '../art/SchoolGuy.jsx';
 import Petals from '../art/Petals.jsx';
-import VoiceButton from '../ui/VoiceButton.jsx';
-import { Close, External, SoundOff, SoundOn } from '../ui/Icons.jsx';
+import VoicePill from '../ui/VoicePill.jsx';
+import BossFight from './BossFight.jsx';
+import Shelf from './Shelf.jsx';
+import SakuraStorm from './SakuraStorm.jsx';
+import { Close, External, Music, SoundOff, SoundOn } from '../ui/Icons.jsx';
 import './anime.css';
+import './extras.css';
 
 const NAV = [
   ['status', 'Status'],
   ['quests', 'Quests'],
-  ['tree', 'Skill Tree'],
-  ['log', 'Adventure Log'],
-  ['party', 'Party Invite'],
+  ['boss', 'Boss Fight'],
+  ['tree', 'Skills'],
+  ['log', 'Log'],
+  ['shelf', 'Shelf'],
+  ['party', 'Party'],
 ];
 
-export default function AnimeWorld({ rootRef, voice, onWake, notify, tier }) {
-  const [soundOn, setSoundOn] = useState(isSoundOn());
-  useEffect(() => onSoundChange(setSoundOn), []);
+const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
-  const toggleSound = () => {
-    setSound(!soundOn);
-    if (!soundOn) setTimeout(() => play('blip'), 30);
+export default function AnimeWorld({ rootRef, voice, onWake, onCommand, notify, tier }) {
+  const [muted, setMutedState] = useState(isMuted());
+  const [lofi, setLofi] = useState(isLofiOn());
+  const [storm, setStorm] = useState(false);
+  useEffect(() => onMuteChange(setMutedState), []);
+  useEffect(() => onLofiChange(setLofi), []);
+  // the music belongs to this world: it stops when you wake up
+  useEffect(() => () => stopLofi(), []);
+
+  const toggleMute = () => {
+    unlockAudio();
+    setMuted(!muted);
+    if (muted) setTimeout(() => play('blip'), 30);
+  };
+  const toggleLofi = () => {
+    unlockAudio();
+    if (lofi) {
+      stopLofi();
+      return;
+    }
+    if (muted) setMuted(false);
+    startLofi();
+    unlockAchievement('lofi');
+    track('lofi_on');
+  };
+
+  // ── secret code: ↑↑↓↓←→←→ B A, or tap the logo five times quickly ──
+  const secret = () => {
+    if (storm) return;
+    setStorm(true);
+    play('win');
+    unlockAchievement('konami');
+    setTimeout(() => setStorm(false), 6500);
+  };
+  const secretRef = useRef(secret);
+  secretRef.current = secret;
+  useEffect(() => {
+    let pos = 0;
+    const onKey = (e) => {
+      if (e.target instanceof Element && e.target.closest('input, textarea')) return;
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      pos = key === KONAMI[pos] ? pos + 1 : key === KONAMI[0] ? 1 : 0;
+      if (pos === KONAMI.length) {
+        pos = 0;
+        secretRef.current();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  const taps = useRef([]);
+  const onLogo = () => {
+    play('blip');
+    const now = Date.now();
+    taps.current = [...taps.current.filter((t) => now - t < 2000), now];
+    if (taps.current.length >= 5) {
+      taps.current = [];
+      secret();
+    }
   };
 
   return (
     <div className="anime" ref={rootRef}>
       <header className="hud">
         <div className="a-wrap hud-row">
-          <a href="#a-top" className="hud-logo">{status.name}</a>
+          <a href="#a-top" className="hud-logo" onClick={onLogo}>{status.name}</a>
           <nav className="hud-nav" aria-label="Areas">
             {NAV.map(([id, label]) => (
               <a key={id} href={`#${id}`} onClick={() => play('blip')}>{label}</a>
@@ -56,14 +118,30 @@ export default function AnimeWorld({ rootRef, voice, onWake, notify, tier }) {
           <div className="hud-actions">
             <button
               type="button"
-              className="hud-icon"
-              onClick={toggleSound}
-              aria-pressed={soundOn}
-              aria-label={soundOn ? 'Sound is on. Turn sound off' : 'Sound is off. Turn sound on'}
+              className={`hud-lofi ${lofi ? 'is-on' : ''}`}
+              onClick={toggleLofi}
+              aria-pressed={lofi}
+              aria-label={lofi ? 'Lo-fi music is on. Turn it off' : 'Play lo-fi music'}
             >
-              {soundOn ? <SoundOn /> : <SoundOff />}
+              <Music width={18} height={18} />
+              <span className="lofi-text">Lo-fi</span>
+              {lofi && (
+                <span className="eq" aria-hidden="true"><i /><i /><i /></span>
+              )}
             </button>
-            <VoiceButton voice={voice} className="hud-icon hud-mic a-hide-mobile" />
+            <button
+              type="button"
+              className="hud-mute"
+              onClick={toggleMute}
+              aria-pressed={muted}
+              aria-label={muted ? 'Sounds are muted. Unmute' : 'Mute sounds'}
+              title={muted ? 'Unmute' : 'Mute'}
+            >
+              {muted ? <SoundOff width={17} height={17} /> : <SoundOn width={17} height={17} />}
+            </button>
+            <div className="a-hide-mobile">
+              <VoicePill voice={voice} world="anime" variant="nav" onCommand={onCommand} />
+            </div>
             <button type="button" className="wake-btn" onClick={(e) => onWake(e.currentTarget)}>
               <span className="a-hide-mobile">Wake up to reality</span>
               <span className="a-show-mobile">Wake up</span>
@@ -76,8 +154,10 @@ export default function AnimeWorld({ rootRef, voice, onWake, notify, tier }) {
         <Landing tier={tier} />
         <Status />
         <Quests />
+        <BossFight />
         <Tree />
         <Log />
+        <Shelf />
         <Achievements />
         <Party notify={notify} />
       </main>
@@ -87,10 +167,10 @@ export default function AnimeWorld({ rootRef, voice, onWake, notify, tier }) {
           <div className="voice-hints">
             <span className="hud-label">VOICE · try saying</span>
             <ul>
-              <li>"show projects"</li>
-              <li>"show skills"</li>
+              <li>"show quests"</li>
+              <li>"boss fight"</li>
               <li>"download resume"</li>
-              <li>"switch mode"</li>
+              <li>"wake up"</li>
             </ul>
           </div>
         )}
@@ -99,17 +179,41 @@ export default function AnimeWorld({ rootRef, voice, onWake, notify, tier }) {
         </button>
       </footer>
 
-      <VoiceButton voice={voice} className="a-fab a-show-mobile-grid" label="Hold to talk: voice commands" />
+      <div className="a-show-mobile-grid fab-slot">
+        <VoicePill voice={voice} world="anime" variant="fab" onCommand={onCommand} />
+      </div>
+      {storm && <SakuraStorm />}
     </div>
   );
 }
 
 // ── landing scene + dialogue ────────────────────────────────
+function useLocalPhase() {
+  const read = () => {
+    let forced = null;
+    try { forced = new URLSearchParams(window.location.search).get('time'); } catch { /* ignore */ }
+    const hours = { dawn: 6, day: 11, golden: 17, night: 22 };
+    const h = forced && hours[forced] !== undefined ? hours[forced] : new Date().getHours();
+    return { phase: phaseFor(h), label: phaseLabel(phaseFor(h), h) };
+  };
+  const [state, setState] = useState(read);
+  useEffect(() => {
+    const id = setInterval(() => setState(read()), 60000);
+    return () => clearInterval(id);
+  }, []);
+  return state;
+}
+
 function Landing({ tier }) {
   const [line, setLine] = useState(0);
   const [shown, setShown] = useState('');
   const [open, setOpen] = useState(true);
+  const { phase, label } = useLocalPhase();
   const text = dialogue[line];
+
+  useEffect(() => {
+    if (phase === 'night') unlockAchievement('night');
+  }, [phase]);
 
   // typewriter, skipped for reduced motion
   useEffect(() => {
@@ -126,6 +230,50 @@ function Landing({ tier }) {
     }, 22);
     return () => clearInterval(id);
   }, [text, tier]);
+
+  // he dozes off after 20s of nobody doing anything, and jolts awake when you're back
+  const sceneRef = useRef(null);
+  const [asleep, setAsleep] = useState(false);
+  const [waking, setWaking] = useState(false);
+  useEffect(() => {
+    let lastActive = Date.now();
+    let visible = true;
+    let sleeping = false;
+    let wakeTimer = 0;
+    const io = new IntersectionObserver(
+      ([e]) => { visible = e.isIntersecting && e.intersectionRatio > 0.35; },
+      { threshold: [0, 0.35, 0.7] },
+    );
+    if (sceneRef.current) io.observe(sceneRef.current);
+    const activity = () => {
+      lastActive = Date.now();
+      if (!sleeping) return;
+      sleeping = false;
+      setAsleep(false);
+      setWaking(true);
+      if (visible) {
+        play('startle');
+        unlockAchievement('nap');
+      }
+      clearTimeout(wakeTimer);
+      wakeTimer = setTimeout(() => setWaking(false), 900);
+    };
+    const events = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'];
+    events.forEach((ev) => window.addEventListener(ev, activity, { passive: true }));
+    const tick = setInterval(() => {
+      if (!sleeping && visible && !document.hidden && Date.now() - lastActive > 20000) {
+        sleeping = true;
+        setAsleep(true);
+        play('doze');
+      }
+    }, 1000);
+    return () => {
+      io.disconnect();
+      clearInterval(tick);
+      clearTimeout(wakeTimer);
+      events.forEach((ev) => window.removeEventListener(ev, activity));
+    };
+  }, []);
 
   const done = shown.length >= text.length;
   const last = line === dialogue.length - 1;
@@ -146,13 +294,19 @@ function Landing({ tier }) {
 
   return (
     <section id="a-top" className="a-wrap landing">
-      <div className="scene">
-        <Skyline />
+      <div className={`scene is-${phase}`} ref={sceneRef}>
+        <Skyline phase={phase} />
         <Petals count={tier === 'full' ? 18 : tier === 'lite' ? 8 : 0} />
         <div className="scene-guy">
-          <SchoolGuy mood="idle" title="hackingPanda, a sleepy anime school guy with messy dark hair, sitting at his desk" />
+          <SchoolGuy
+            mood="idle"
+            asleep={asleep}
+            waking={waking}
+            title={`hackingPanda, a sleepy anime school guy with messy dark hair, sitting at his desk${asleep ? ', fast asleep' : ''}`}
+          />
+          {waking && <span className="guy-alert" aria-hidden="true">!</span>}
         </div>
-        <p className="scene-place">Hyderabad · golden hour</p>
+        <p className="scene-place">Hyderabad · {label}</p>
         {open ? (
           <div className="dialogue">
             <span className="dialogue-name">{status.name}</span>
@@ -178,6 +332,7 @@ function Status() {
   const onResume = () => {
     downloadResume(profile.resume);
     unlockAchievement('resume');
+    track('resume', { side: 'anime' });
   };
   return (
     <section id="status" className="a-wrap a-section status-row">
@@ -360,19 +515,24 @@ function Log() {
 function Achievements() {
   const [got, setGot] = useState(getAchievements());
   useEffect(() => onAchievement(() => setGot(getAchievements())), []);
+  const count = achievementList.filter((a) => got.includes(a.id)).length;
   return (
     <section id="achievements" className="a-wrap a-section">
       <div className="ach-head">
         <h2 className="a-h2 on-dark">Achievements</h2>
-        <span className="ach-count">{got.length} / {achievementList.length}</span>
+        <span className="ach-count">{count} / {achievementList.length}</span>
       </div>
       <ul className="ach-list">
         {achievementList.map((a) => {
           const has = got.includes(a.id);
           return (
-            <li key={a.id} className={`ach ${has ? 'is-on' : ''}`}>
+            <li key={a.id} className={`ach ${has ? 'is-on' : ''} ${a.secret ? 'is-secret' : ''}`}>
               <span className="ach-dot" aria-hidden="true" />
-              <span>{has ? a.title : `${a.title} (locked)`}</span>
+              <span className="ach-text">
+                <span className="ach-title">{has ? a.title : a.secret ? '??? (secret)' : a.title}</span>
+                {!has && <span className="ach-hint">{a.hint}</span>}
+                {!has && <span className="sr-only"> (locked)</span>}
+              </span>
             </li>
           );
         })}
@@ -393,12 +553,14 @@ function Party({ notify }) {
       name: String(fd.get('name') || ''),
       email: String(fd.get('email') || ''),
       message: String(fd.get('message') || ''),
+      botcheck: fd.get('botcheck'),
     });
     if (res.ok) {
       setState('sent');
       form.reset();
       notify({ kind: 'info', eyebrow: 'PARTY INVITE', title: 'Quest accepted!' });
       unlockAchievement('party');
+      if (!res.spam) track('contact_sent', { side: 'anime' });
     } else {
       setState(res.reason === 'not-configured' ? 'not-configured' : 'error');
     }
@@ -422,6 +584,12 @@ function Party({ notify }) {
         <input id="p-email" name="email" type="email" autoComplete="email" required />
         <label htmlFor="p-msg">Message</label>
         <textarea id="p-msg" name="message" rows={4} required />
+        <div className="hp-field" aria-hidden="true">
+          <label>
+            Leave this unticked
+            <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" />
+          </label>
+        </div>
         <button type="submit" className="a-btn a-btn-gold big" disabled={state === 'sending'}>
           {state === 'sending' ? 'Sending…' : 'Send invite'}
         </button>

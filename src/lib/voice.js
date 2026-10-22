@@ -8,6 +8,7 @@ const SR = typeof window !== 'undefined' ? window.SpeechRecognition || window.we
 const COMMANDS = [
   ['switch', /\b(switch|isekai|wake up|other side|change mode|anime mode|normal mode)\b/],
   ['resume', /\b(resume|cv|curriculum)\b/],
+  ['boss', /\b(boss|fight|battle|quiz)\b/],
   ['projects', /\b(projects?|quests?|work|portfolio)\b/],
   ['skills', /\b(skills?|skill tree|stack|tech)\b/],
   ['contact', /\b(contact|invite|email|message|hire|reach)\b/],

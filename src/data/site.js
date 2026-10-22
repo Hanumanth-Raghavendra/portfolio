@@ -150,16 +150,162 @@ export const dialogue = [
   'Quests are my projects. The status window is me. Have a look around.',
 ];
 
+// hint = what the locked badge says; secret ones stay "???" until found
 export const achievementList = [
-  { id: 'portal', title: 'Found the other side' },
-  { id: 'quests', title: 'Read every quest' },
-  { id: 'resume', title: 'Legendary drop' },
-  { id: 'party', title: 'Party formed' },
+  { id: 'portal', title: 'Found the other side', hint: "Get isekai'd" },
+  { id: 'quests', title: 'Read every quest', hint: 'Open both quest logs' },
+  { id: 'resume', title: 'Legendary drop', hint: 'Grab the resume' },
+  { id: 'party', title: 'Party formed', hint: 'Send a party invite' },
+  { id: 'voice', title: 'Spoke the incantation', hint: 'Use a voice command' },
+  { id: 'nap', title: 'Caught napping', hint: 'Let him doze off, then wake him' },
+  { id: 'boss', title: 'Bug squashed', hint: 'Win the boss fight' },
+  { id: 'flawless', title: 'Flawless debug', hint: 'Win without losing a heart' },
+  { id: 'lofi', title: 'Vibe check', hint: 'Turn on the lo-fi' },
+  { id: 'night', title: 'Night owl', hint: 'Visit after dark' },
+  { id: 'konami', title: 'Old-school code', hint: 'An old cheat code still works here', secret: true },
+];
+
+// The shelf (text only, no cover art). These lines are genres and games;
+// swap in real titles any time, e.g. { title: 'Some Anime', note: 'rewatching' }.
+export const shelf = [
+  {
+    id: 'watching',
+    label: 'Watching',
+    tag: 'ANIME',
+    items: [{ title: 'Action' }, { title: 'Thriller' }, { title: 'Comedy' }, { title: 'Magic' }, { title: 'Adventure' }],
+  },
+  {
+    id: 'reading',
+    label: 'Reading',
+    tag: 'WEBTOONS · MANGA',
+    items: [{ title: 'Manhwa' }, { title: 'Manhua' }, { title: 'Manga' }],
+  },
+  {
+    id: 'playing',
+    label: 'Playing',
+    tag: 'GAMES',
+    items: [{ title: 'BGMI' }, { title: 'Call of Duty' }, { title: 'Chess', note: 'and cooking, off the board' }],
+  },
+];
+
+// Boss fight question pool (Java / Spring / web). `a` = index of the right answer.
+export const bossQuestions = [
+  {
+    q: 'Which Java collection refuses duplicate elements?',
+    options: ['ArrayList', 'HashSet', 'LinkedList', 'ArrayDeque'],
+    a: 1,
+    why: 'A Set keeps only unique elements. HashSet uses hashCode() and equals() to spot duplicates.',
+  },
+  {
+    q: 'What does final on a Java variable guarantee?',
+    options: ["It can't be reassigned", "The object it points to can't change", "It's shared by all threads", "It's stored on the heap"],
+    a: 0,
+    why: 'final stops reassignment. The object itself can still be changed unless it is immutable.',
+  },
+  {
+    q: "How do you compare two Strings' contents in Java?",
+    options: ['a == b', 'a.equals(b)', 'a.compareTo(b) == 1', 'a.hashCode() == b.hashCode()'],
+    a: 1,
+    why: '== compares references; equals() compares the characters. Equal hash codes don’t guarantee equal strings.',
+  },
+  {
+    q: 'Which Spring annotation writes every handler’s return value straight to the response body?',
+    options: ['@Controller', '@RestController', '@Service', '@Repository'],
+    a: 1,
+    why: '@RestController is @Controller + @ResponseBody, so returned objects are serialised, usually to JSON.',
+  },
+  {
+    q: 'What does @Autowired ask Spring to do?',
+    options: ['Inject a matching bean', 'Create a database table', 'Start a new thread', "Cache the method's result"],
+    a: 0,
+    why: 'It’s dependency injection: Spring finds a bean of the required type and wires it in.',
+  },
+  {
+    q: 'Which HTTP status code means a new resource was created?',
+    options: ['200', '201', '204', '302'],
+    a: 1,
+    why: '201 Created. 204 means success with no response body.',
+  },
+  {
+    q: "Which JPA annotation marks an entity's primary key?",
+    options: ['@Id', '@Key', '@Primary', '@Column'],
+    a: 0,
+    why: '@Id marks the primary key (often with @GeneratedValue). @Primary is Spring’s way to prefer one bean.',
+  },
+  {
+    q: 'Which SQL clause filters groups after GROUP BY?',
+    options: ['WHERE', 'HAVING', 'ORDER BY', 'LIMIT'],
+    a: 1,
+    why: 'WHERE filters rows before grouping; HAVING filters the groups, e.g. HAVING COUNT(*) > 5.',
+  },
+  {
+    q: 'Which React hook is meant for side effects like fetching data?',
+    options: ['useState', 'useMemo', 'useEffect', 'useRef'],
+    a: 2,
+    why: 'useEffect runs after render, so it’s where fetching, subscriptions and timers go.',
+  },
+  {
+    q: "What does a JWT's signature protect against?",
+    options: ['Anyone reading the payload', 'Anyone tampering with the payload', 'The token ever expiring', 'SQL injection'],
+    a: 1,
+    why: 'A signed JWT’s payload is only Base64URL-encoded, so anyone can read it. The signature proves nobody changed it.',
+  },
+  {
+    q: 'After adding Spring Security, the browser’s CORS preflights were blocked. Why?',
+    options: [
+      "Browsers don't allow CORS with JWT",
+      'The OPTIONS preflight hit the security filters before reaching the controllers',
+      'PostgreSQL blocked the port',
+      "React can't send JSON headers",
+    ],
+    a: 1,
+    why: 'Security filters ran first and rejected the preflight. Enabling CORS inside the Spring Security config fixed it: the real EMS boss fight.',
+  },
+  {
+    q: 'Which of these is NOT a Java primitive type?',
+    options: ['int', 'boolean', 'String', 'char'],
+    a: 2,
+    why: 'String is a class (java.lang.String). Java has 8 primitives, including int, boolean and char.',
+  },
+  {
+    q: 'Average time complexity of HashMap.get()?',
+    options: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'],
+    a: 0,
+    why: 'Constant time on average with a decent hash. Heavy collisions slow it down (Java 8+ turns long buckets into trees).',
+  },
+  {
+    q: 'Which of these is a checked exception?',
+    options: ['NullPointerException', 'IOException', 'ArithmeticException', 'ArrayIndexOutOfBoundsException'],
+    a: 1,
+    why: 'Checked exceptions must be caught or declared with throws. The other three extend RuntimeException.',
+  },
+  {
+    q: 'Which HTTP method fully replaces a resource and is idempotent?',
+    options: ['POST', 'PUT', 'PATCH', 'CONNECT'],
+    a: 1,
+    why: 'Sending the same PUT twice has the same effect as once. POST isn’t idempotent; PATCH applies partial changes.',
+  },
+  {
+    q: 'In Docker, what is a container?',
+    options: ['A running instance of an image', 'A VM with its own kernel', 'A zipped source-code archive', 'A Kubernetes cluster'],
+    a: 0,
+    why: 'An image is the read-only template; a container is a running instance of it, sharing the host’s kernel.',
+  },
 ];
 
 // Which section on one side matches which on the other, so
 // switching worlds keeps you in the same place.
 export const sectionMap = {
-  toAnime: { top: 'a-top', about: 'status', skills: 'tree', projects: 'quests', journey: 'log', now: 'status', contact: 'party' },
-  toPro: { 'a-top': 'top', status: 'about', quests: 'projects', tree: 'skills', log: 'journey', achievements: 'journey', party: 'contact' },
+  toAnime: { top: 'a-top', about: 'status', skills: 'tree', projects: 'quests', journey: 'log', now: 'shelf', contact: 'party' },
+  toPro: {
+    'a-top': 'top',
+    status: 'about',
+    quests: 'projects',
+    boss: 'skills',
+    tree: 'skills',
+    log: 'journey',
+    shelf: 'now',
+    achievements: 'now',
+    party: 'contact',
+  },
 };

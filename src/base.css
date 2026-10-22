@@ -259,6 +259,204 @@ button {
   }
 }
 
+/* ── voice pill: labelled mic, first-visit hint, example-command chips ── */
+.vp {
+  position: relative;
+}
+.vp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px 0 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.vp.has-hint .vp-btn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid currentColor;
+  animation: listen 1.5s ease-out infinite;
+  pointer-events: none;
+}
+.vp-pro .vp-btn {
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+.vp-pro .vp-btn:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.vp-anime .vp-btn {
+  border: 2px solid #22d3ee;
+  background: #10213a;
+  color: #a5f3fc;
+  font-family: var(--font-anime-body);
+  font-weight: 800;
+}
+.vp-anime .vp-btn:hover {
+  background: #133054;
+}
+
+.vp-hint,
+.vp-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  z-index: 60;
+  animation: toast-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+.vp-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px 8px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.vp-hint::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  right: 30px;
+  width: 12px;
+  height: 12px;
+  rotate: 45deg;
+  background: inherit;
+  border-left: inherit;
+  border-top: inherit;
+}
+.vp-hint-x {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.vp-panel {
+  width: max-content;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 12px;
+  border-radius: 14px;
+}
+.vp-panel-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+.vp-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.vp-chip {
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.vp-pro .vp-hint,
+.vp-pro .vp-panel {
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  color: var(--fg);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+}
+.vp-pro .vp-panel-title {
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.vp-pro .vp-chip {
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--fg);
+}
+.vp-pro .vp-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.vp-anime .vp-hint,
+.vp-anime .vp-panel {
+  background: #fff7ec;
+  color: #1a1033;
+  border: 3px solid #0e0820;
+  box-shadow: 5px 5px 0 #22d3ee;
+  font-family: var(--font-anime-body);
+  font-weight: 700;
+}
+.vp-anime .vp-chip {
+  border: 2px solid #0e0820;
+  background: #1a1033;
+  color: #fff7ec;
+  font-family: var(--font-anime-body);
+  font-weight: 800;
+}
+.vp-anime .vp-chip:hover {
+  background: #2b1d55;
+}
+
+/* floating version on phones: bottom-right, opens upward */
+.fab-slot {
+  position: fixed;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  z-index: 60;
+}
+.vp-fab .vp-btn {
+  height: 52px;
+  padding: 0 18px 0 16px;
+  font-size: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.vp-pro.vp-fab .vp-btn {
+  background: var(--surface);
+}
+.vp-anime.vp-fab .vp-btn {
+  background: #22d3ee;
+  color: #1a1033;
+  border: 3px solid #0e0820;
+  box-shadow: 3px 3px 0 #0e0820;
+}
+.vp-fab .vp-hint,
+.vp-fab .vp-panel {
+  top: auto;
+  bottom: calc(100% + 14px);
+}
+.vp-fab .vp-hint::before {
+  top: auto;
+  bottom: -7px;
+  border: 0;
+  border-right: inherit;
+  border-bottom: inherit;
+}
+
+/* spam trap: invisible to people, irresistible to bots */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

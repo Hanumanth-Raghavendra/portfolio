@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { profile, skills, projects, journey, now } from '../data/site.js';
 import { copyText, downloadResume, sendMessage, store } from '../lib/engine.js';
-import VoiceButton from '../ui/VoiceButton.jsx';
+import { track } from '../lib/analytics.js';
+import VoicePill from '../ui/VoicePill.jsx';
 import { Arrow, Copy, Download, External, Menu, Close, Moon, Sun } from '../ui/Icons.jsx';
 import './pro.css';
 
@@ -13,13 +14,17 @@ const NAV = [
   ['contact', 'Contact'],
 ];
 
-export default function ProWorld({ rootRef, onIsekai, onPreload, voice, theme, onToggleTheme, notify }) {
+// Only two doors to the anime side now: the crack in the hero and the footer
+// (plus a one-time nudge once someone has read down to Contact).
+export default function ProWorld({ rootRef, onIsekai, onPreload, voice, onCommand, theme, onToggleTheme, notify }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isekai = (e) => {
+  const isekai = (from) => (e) => {
     setMenuOpen(false);
-    onIsekai(e.currentTarget);
+    onIsekai(e.currentTarget, from);
   };
+
+  useScrollDepth();
 
   return (
     <div className="pro" ref={rootRef}>
@@ -37,7 +42,9 @@ export default function ProWorld({ rootRef, onIsekai, onPreload, voice, theme, o
             ))}
           </nav>
           <div className="nav-actions">
-            <VoiceButton voice={voice} className="icon-btn hide-mobile" />
+            <div className="hide-mobile">
+              <VoicePill voice={voice} world="pro" variant="nav" onCommand={onCommand} />
+            </div>
             <button
               type="button"
               className="icon-btn"
@@ -45,15 +52,6 @@ export default function ProWorld({ rootRef, onIsekai, onPreload, voice, theme, o
               aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               {theme === 'dark' ? <Sun /> : <Moon />}
-            </button>
-            <button
-              type="button"
-              className="isekai-pill hide-mobile"
-              onPointerEnter={onPreload}
-              onFocus={onPreload}
-              onClick={isekai}
-            >
-              Get isekai'd <Arrow width={16} height={16} />
             </button>
             <button
               type="button"
@@ -71,14 +69,11 @@ export default function ProWorld({ rootRef, onIsekai, onPreload, voice, theme, o
           {NAV.map(([id, label]) => (
             <a key={id} href={`#${id}`} onClick={() => setMenuOpen(false)}>{label}</a>
           ))}
-          <button type="button" className="isekai-pill" onPointerEnter={onPreload} onTouchStart={onPreload} onClick={isekai}>
-            Get isekai'd <Arrow width={16} height={16} />
-          </button>
         </nav>
       </header>
 
       <main>
-        <Hero onIsekai={isekai} onPreload={onPreload} />
+        <Hero onIsekai={isekai('hero')} onPreload={onPreload} />
         <About />
         <Skills />
         <Projects />
@@ -90,29 +85,107 @@ export default function ProWorld({ rootRef, onIsekai, onPreload, voice, theme, o
       <footer className="pro-footer">
         <div className="wrap footer-row">
           <span>© 2026 {profile.name}</span>
-          <button type="button" className="footer-hint" onPointerEnter={onPreload} onFocus={onPreload} onClick={isekai}>
+          <button
+            type="button"
+            className="footer-hint"
+            data-cursor="portal"
+            onPointerEnter={onPreload}
+            onFocus={onPreload}
+            onClick={isekai('footer')}
+          >
             There's another side to this site <Arrow width={14} height={14} />
           </button>
         </div>
       </footer>
 
-      <VoiceButton voice={voice} className="voice-fab show-mobile" label="Hold to talk: voice commands" />
+      <ContactNudge onIsekai={isekai('nudge')} onPreload={onPreload} />
+      <div className="show-mobile fab-slot">
+        <VoicePill voice={voice} world="pro" variant="fab" onCommand={onCommand} />
+      </div>
+    </div>
+  );
+}
+
+// ── analytics: how far down the pro side people actually read ──
+function useScrollDepth() {
+  useEffect(() => {
+    const sent = new Set();
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (max <= 0) return;
+      const pct = (window.scrollY / max) * 100;
+      [25, 50, 75, 100].forEach((d) => {
+        if (pct >= d - 1 && !sent.has(d)) {
+          sent.add(d);
+          track('pro_scroll', { depth: d });
+        }
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+}
+
+// ── one-time nudge, only after someone has read down to Contact ──
+function ContactNudge({ onIsekai, onPreload }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (store.get('hp-contact-nudge')) return undefined;
+    const target = document.getElementById('contact');
+    if (!target) return undefined;
+    let timer = 0;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        store.set('hp-contact-nudge', '1');
+        timer = setTimeout(() => {
+          setShow(true);
+          onPreload();
+        }, 1200);
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(target);
+    return () => {
+      io.disconnect();
+      clearTimeout(timer);
+    };
+  }, [onPreload]);
+  useEffect(() => {
+    if (!show) return undefined;
+    const t = setTimeout(() => setShow(false), 14000);
+    return () => clearTimeout(t);
+  }, [show]);
+
+  if (!show) return null;
+  return (
+    <div className="contact-nudge" role="note">
+      <p>
+        Done reading? <span>There's a crack in this page.</span>
+      </p>
+      <div className="contact-nudge-actions">
+        <button
+          type="button"
+          className="isekai-pill"
+          data-cursor="portal"
+          onClick={(e) => {
+            setShow(false);
+            onIsekai(e);
+          }}
+        >
+          Get isekai'd <Arrow width={16} height={16} />
+        </button>
+        <button type="button" className="nudge-x" aria-label="Dismiss" onClick={() => setShow(false)}>
+          <Close width={16} height={16} />
+        </button>
+      </div>
     </div>
   );
 }
 
 // ── hero ────────────────────────────────────────────────────
 function Hero({ onIsekai, onPreload }) {
-  const [nudge, setNudge] = useState(false);
-  useEffect(() => {
-    if (store.session.get('hp-nudged')) return undefined;
-    const t = setTimeout(() => {
-      setNudge(true);
-      store.session.set('hp-nudged', '1');
-    }, 15000);
-    return () => clearTimeout(t);
-  }, []);
-
   return (
     <section id="top" className="hero wrap">
       <div className="hero-copy">
@@ -127,13 +200,14 @@ function Hero({ onIsekai, onPreload }) {
             className="btn btn-ghost"
             href={profile.resume}
             download="Hanumanth_Raghavendra_Resume.pdf"
+            onClick={() => track('resume', { side: 'pro', from: 'hero' })}
           >
             <Download width={18} height={18} /> Download resume
           </a>
         </div>
       </div>
 
-      <div className="crack-card" onPointerEnter={onPreload} onTouchStart={onPreload}>
+      <div className="crack-card" data-cursor="portal" onPointerEnter={onPreload} onTouchStart={onPreload}>
         <svg className="crack-svg" viewBox="0 0 380 420" preserveAspectRatio="none" aria-hidden="true">
           <path className="crack-glow-wide" d="M250 0 L228 92 L262 128 L214 196 L246 236 L196 300 L222 336 L188 420" />
           <path className="crack-glow" d="M250 0 L228 92 L262 128 L214 196 L246 236 L196 300 L222 336 L188 420" />
@@ -152,14 +226,6 @@ function Hero({ onIsekai, onPreload }) {
             Get isekai'd <Arrow width={18} height={18} />
           </button>
         </div>
-        {nudge && (
-          <div className="nudge" role="note">
-            psst… there's more.
-            <button type="button" className="nudge-x" aria-label="Dismiss hint" onClick={() => setNudge(false)}>
-              <Close width={14} height={14} />
-            </button>
-          </div>
-        )}
       </div>
     </section>
   );
@@ -370,10 +436,12 @@ function Contact({ notify }) {
       name: String(fd.get('name') || ''),
       email: String(fd.get('email') || ''),
       message: String(fd.get('message') || ''),
+      botcheck: fd.get('botcheck'),
     });
     if (res.ok) {
       setStatus('sent');
       e.target.reset?.();
+      if (!res.spam) track('contact_sent', { side: 'pro' });
     } else {
       setStatus(res.reason === 'not-configured' ? 'not-configured' : 'error');
     }
@@ -394,7 +462,14 @@ function Contact({ notify }) {
             </button>
             <a className="btn btn-ghost btn-sm" href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <External /></a>
             <a className="btn btn-ghost btn-sm" href={profile.github} target="_blank" rel="noreferrer">GitHub <External /></a>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => downloadResume(profile.resume)}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => {
+                downloadResume(profile.resume);
+                track('resume', { side: 'pro', from: 'contact' });
+              }}
+            >
               <Download width={16} height={16} /> Resume
             </button>
           </div>
@@ -413,6 +488,12 @@ function Contact({ notify }) {
           <div className="field">
             <label htmlFor="c-msg">Message</label>
             <textarea id="c-msg" name="message" rows={5} required />
+          </div>
+          <div className="hp-field" aria-hidden="true">
+            <label>
+              Leave this unticked
+              <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" />
+            </label>
           </div>
           <button type="submit" className="btn btn-primary" disabled={status === 'sending'}>
             {status === 'sending' ? 'Sending…' : 'Send message'}

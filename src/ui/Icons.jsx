@@ -39,6 +39,9 @@ export const SoundOn = (p) => (
 export const SoundOff = (p) => (
   <svg {...base} {...p}><path d="M4 9h4l5-4v14l-5-4H4z" /><path d="M17 9l4 6M21 9l-4 6" /></svg>
 );
+export const Music = (p) => (
+  <svg {...base} {...p}><path d="M9 18V6l11-2v12" /><circle cx="6.5" cy="18" r="2.5" /><circle cx="17.5" cy="16" r="2.5" /></svg>
+);
 export const Trophy = (p) => (
   <svg {...base} {...p}><path d="M8 4h8v5a4 4 0 0 1-8 0z" /><path d="M8 6H5a3 3 0 0 0 3 4" /><path d="M16 6h3a3 3 0 0 1-3 4" /><path d="M12 13v4" /><path d="M8 20h8" /></svg>
 );

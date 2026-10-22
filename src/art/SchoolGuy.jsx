@@ -13,12 +13,16 @@ import headClosedUrl from './guy/head-closed.webp';
 //         'swap'  – both heads rendered; GSAP drives the wake-up
 export const GUY = { w: 655, vw: 672, h: 978, head: { x: 194, y: -2, w: 210, h: 224 }, pivot: { x: 276, y: 206 } };
 
-export default function SchoolGuy({ mood = 'idle', className = '', title, ...rest }) {
+// asleep / waking (idle mood only): he dozes off when the visitor goes quiet,
+// and jolts awake when they come back. The outer "pose" group handles that,
+// so it never fights the idle sway on the inner head group.
+export default function SchoolGuy({ mood = 'idle', asleep = false, waking = false, className = '', title, ...rest }) {
   const { head } = GUY;
   const showClosed = mood === 'sleep' || mood === 'swap' || mood === 'idle';
+  const showZzz = mood === 'sleep' || mood === 'idle';
   return (
     <svg
-      className={`school-guy mood-${mood} ${className}`}
+      className={`school-guy mood-${mood} ${asleep ? 'is-asleep' : ''} ${waking ? 'is-waking' : ''} ${className}`}
       viewBox={`0 0 ${GUY.vw} ${GUY.h}`}
       overflow="visible"
       role={title ? 'img' : undefined}
@@ -36,16 +40,19 @@ export default function SchoolGuy({ mood = 'idle', className = '', title, ...res
         <path d="M646 448 L663 449 Q669 450 669 455 L669 472 L646 474 Z" fill="#8f7563" />
       </g>
       <image className="guy-base" href={baseUrl} width={GUY.w} height={GUY.h} />
-      <g className="guy-head">
-        <image href={headUrl} x={head.x} y={head.y} width={head.w} height={head.h} />
-        {showClosed && (
-          <image className="guy-head-closed" href={headClosedUrl} x={head.x} y={head.y} width={head.w} height={head.h} />
-        )}
+      <g className="guy-pose">
+        <g className="guy-head">
+          <image href={headUrl} x={head.x} y={head.y} width={head.w} height={head.h} />
+          {showClosed && (
+            <image className="guy-head-closed" href={headClosedUrl} x={head.x} y={head.y} width={head.w} height={head.h} />
+          )}
+        </g>
       </g>
-      {mood === 'sleep' && (
+      {showZzz && (
         <g className="guy-zzz" fill="#f8f4ff" stroke="#1a1033" strokeWidth="5" paintOrder="stroke" fontFamily="var(--font-anime-display)" fontWeight="700">
           <text x="420" y="80" fontSize="64">z</text>
           <text x="470" y="30" fontSize="46">z</text>
+          <text x="512" y="-12" fontSize="34">z</text>
         </g>
       )}
     </svg>

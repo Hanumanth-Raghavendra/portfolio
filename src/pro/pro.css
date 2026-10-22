@@ -166,10 +166,6 @@
   font-size: 17px;
   border-bottom: 1px solid var(--line);
 }
-.mobile-menu .isekai-pill {
-  margin-top: 12px;
-  align-self: flex-start;
-}
 
 .show-mobile {
   display: none !important;
@@ -426,6 +422,57 @@
   display: grid;
   place-items: center;
   cursor: pointer;
+}
+
+/* one-time nudge after reading down to Contact */
+.contact-nudge {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 70;
+  width: min(380px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 14px 14px 18px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--sakura);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), 0 0 30px color-mix(in srgb, var(--sakura) 18%, transparent);
+  animation: nudge-in 0.45s cubic-bezier(0.2, 1.2, 0.3, 1);
+}
+.contact-nudge p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+}
+.contact-nudge p span {
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-2);
+}
+.contact-nudge-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+@keyframes nudge-in {
+  from {
+    transform: translateY(18px) scale(0.97);
+    opacity: 0;
+  }
+}
+@media (max-width: 860px) {
+  .contact-nudge {
+    left: 16px;
+    right: 16px;
+    width: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 86px);
+  }
 }
 
 /* bands */

@@ -134,7 +134,10 @@ export async function copyText(text, fallbackEl) {
 // Set VITE_WEB3FORMS_KEY in Vercel → Project → Settings → Environment Variables.
 const FORM_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
 
-export async function sendMessage({ name, email, message }) {
+export async function sendMessage({ name, email, message, botcheck }) {
+  // Spam trap: humans never see or tick the hidden "botcheck" box; bots fill every field.
+  // Pretend it worked so the bot moves on, and don't spend a Web3Forms submission on it.
+  if (botcheck) return { ok: true, spam: true };
   if (!FORM_KEY) return { ok: false, reason: 'not-configured' };
   try {
     const res = await fetch('https://api.web3forms.com/submit', {

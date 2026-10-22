@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import ProWorld from './pro/ProWorld.jsx';
 import TransitionLayer from './fx/TransitionLayer.jsx';
+import Cursor from './fx/Cursor.jsx';
 import Toasts from './ui/Toasts.jsx';
 import { portalDive, wakeUp, shake } from './fx/timelines.js';
 import {
@@ -14,7 +15,8 @@ import {
   store,
   unlockAchievement,
 } from './lib/engine.js';
-import { play, unlockAudio } from './lib/sound.js';
+import { play, setSoundActive, unlockAudio } from './lib/sound.js';
+import { track } from './lib/analytics.js';
 import { useVoice } from './lib/voice.js';
 import { achievementList, profile, sectionMap } from './data/site.js';
 
@@ -28,7 +30,7 @@ function loadAnime() {
   return animeModule;
 }
 
-const ANIME_IDS = ['a-top', 'status', 'quests', 'tree', 'log', 'achievements', 'party'];
+const ANIME_IDS = ['a-top', 'status', 'quests', 'boss', 'tree', 'log', 'shelf', 'achievements', 'party'];
 const VOICE_TARGETS = {
   projects: ['projects', 'quests'],
   skills: ['skills', 'tree'],
@@ -36,6 +38,7 @@ const VOICE_TARGETS = {
   journey: ['journey', 'log'],
   contact: ['contact', 'party'],
   top: ['top', 'a-top'],
+  boss: ['skills', 'boss'],
 };
 const VOICE_LINES = {
   pro: {
@@ -45,6 +48,7 @@ const VOICE_LINES = {
     journey: 'Showing journey',
     contact: 'Showing contact',
     top: 'Back to top',
+    boss: 'Showing skills (the boss fight lives on the other side)',
   },
   anime: {
     projects: 'Opening the quest board!',
@@ -53,6 +57,7 @@ const VOICE_LINES = {
     journey: 'Opening the adventure log!',
     contact: 'Party invite ready!',
     top: 'Back to the start!',
+    boss: 'Boss fight! Good luck.',
   },
 };
 
@@ -131,11 +136,13 @@ export default function App() {
 
   // ── pro → anime ──
   const goAnime = useCallback(
-    (originEl) => {
+    (originEl, from = 'other') => {
       if (busy.current) return skip();
       busy.current = true;
-      unlockAudio();
+      unlockAudio(); // this click is what lets the anime side play sound
+      setSoundActive(true);
       play('whoosh');
+      track('isekai', { from });
       setAnnounce('Entering the anime side');
       const pending = loadAnime();
       const r = originEl?.getBoundingClientRect?.();
@@ -177,6 +184,7 @@ export default function App() {
     busy.current = true;
     unlockAudio();
     play('rewind');
+    track('wake');
     setAnnounce('Waking up. Back to the professional side');
     const target = sectionMap.toPro[currentSection(ANIME_IDS)] || 'top';
     const calmColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
@@ -195,6 +203,7 @@ export default function App() {
         busy.current = false;
         tl.current = null;
         setAnnounce('');
+        setSoundActive(false); // the pro side stays silent
       },
     });
     return undefined;
@@ -202,7 +211,7 @@ export default function App() {
 
   // ── voice ──
   const onVoice = useCallback(
-    ({ command, heard, error }) => {
+    ({ command, heard, error, source = 'voice' }) => {
       if (error) {
         const blocked = error === 'not-allowed' || error === 'service-not-allowed';
         notify({
@@ -216,13 +225,16 @@ export default function App() {
         notify({ title: heard ? `Heard "${heard}". Try "show projects".` : 'Try "show projects".' });
         return;
       }
+      track('voice', { command, source, world: w });
+      if (source === 'voice') unlockAchievement('voice');
       if (command === 'switch') {
-        if (w === 'pro') goAnime(null);
+        if (w === 'pro') goAnime(null, source);
         else goPro();
         return;
       }
       if (command === 'resume') {
         downloadResume(profile.resume);
+        track('resume', { side: w, from: source });
         if (w === 'anime') unlockAchievement('resume');
         notify({ title: w === 'anime' ? 'Legendary item obtained: resume!' : 'Downloading resume' });
         return;
@@ -235,6 +247,8 @@ export default function App() {
     [goAnime, goPro, notify],
   );
   const voice = useVoice(onVoice);
+  // the example-command chips run the same commands without a microphone
+  const onCommand = useCallback((command) => onVoice({ command, source: 'chip' }), [onVoice]);
 
   // keep the pro side honest about being mounted on first paint
   useEffect(() => {
@@ -250,17 +264,19 @@ export default function App() {
             onIsekai={goAnime}
             onPreload={loadAnime}
             voice={voice}
+            onCommand={onCommand}
             theme={theme}
             onToggleTheme={toggleTheme}
             notify={notify}
           />
         )}
         {world === 'anime' && Anime && (
-          <Anime rootRef={animeRoot} voice={voice} onWake={goPro} notify={notify} tier={tier} />
+          <Anime rootRef={animeRoot} voice={voice} onCommand={onCommand} onWake={goPro} notify={notify} tier={tier} />
         )}
       </div>
       <TransitionLayer fxRef={fx} tier={tier} onSkip={skip} announce={announce} withGuy={metAnime.current} />
       <Toasts toasts={toasts} world={world} />
+      <Cursor world={world} tier={tier} />
     </>
   );
 }
