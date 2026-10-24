@@ -808,6 +808,12 @@
   font-size: 12px;
   color: var(--muted);
 }
+.arch-node span.arch-host {
+  margin-top: 4px;
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  color: var(--accent);
+}
 .arch-arrow {
   color: var(--accent);
   font-size: 18px;

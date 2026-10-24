@@ -319,6 +319,7 @@ function Projects() {
                     <div className={`arch-node ${n.main ? 'is-main' : ''}`}>
                       <strong>{n.name}</strong>
                       <span>{n.detail}</span>
+                      {n.host && <span className="arch-host">{n.host}</span>}
                     </div>
                     {i < ems.architecture.length - 1 && <span className="arch-arrow" aria-hidden="true">→</span>}
                   </div>
@@ -337,6 +338,9 @@ function Projects() {
             <ul className="tags tags-outline">{ems.modules.map((m) => <li key={m}>{m}</li>)}</ul>
             <Challenge text={ems.challenge} />
             <div className="project-links">
+              <a className="btn btn-primary btn-sm" href={ems.live} target="_blank" rel="noreferrer">
+                Live demo <External />
+              </a>
               <a className="btn btn-ghost btn-sm" href={ems.github} target="_blank" rel="noreferrer">
                 View on GitHub <External />
               </a>

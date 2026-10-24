@@ -26,7 +26,7 @@ export const skills = [
   { group: 'Frontend', items: ['React', 'Redux Toolkit', 'Material UI', 'HTML5', 'CSS3'] },
   { group: 'Backend', items: ['Spring Boot', 'Spring Security', 'JPA / Hibernate', 'Node.js', 'REST APIs', 'JWT'] },
   { group: 'Database', items: ['PostgreSQL', 'Flyway'] },
-  { group: 'Cloud & Tools', items: ['Docker', 'AWS', 'Git / GitHub', 'Maven', 'Vercel'] },
+  { group: 'Cloud & Tools', items: ['Docker', 'AWS', 'Git / GitHub', 'Maven', 'Vercel', 'Render', 'Neon'] },
   { group: 'AI & Voice', items: ['Gemini API', 'Web Speech API'] },
   { group: 'Learning', items: ['Azure'] },
 ];
@@ -60,9 +60,9 @@ export const projects = [
       'A full-stack HR platform with JWT security, role-based access, and eight management modules, replacing scattered spreadsheets with one secure app.',
     problem: 'Brings employees, attendance, leave, projects and users into one secure app instead of scattered spreadsheets.',
     architecture: [
-      { name: 'React', detail: 'Redux Toolkit · MUI' },
-      { name: 'Spring Boot API', detail: 'Spring Security · JWT', main: true },
-      { name: 'PostgreSQL', detail: 'Flyway · JPA' },
+      { name: 'React', detail: 'Redux Toolkit · MUI', host: 'Hosted on Vercel' },
+      { name: 'Spring Boot API', detail: 'Spring Security · JWT', host: 'Hosted on Render', main: true },
+      { name: 'PostgreSQL', detail: 'Flyway · JPA', host: 'Hosted on Neon' },
     ],
     stats: [
       { value: '49', label: 'REST endpoints' },
@@ -73,7 +73,9 @@ export const projects = [
     challenge:
       "After adding Spring Security, the browser's preflight requests from React were blocked before reaching the controllers. Fixed by configuring CORS at the Spring Security level.",
     stack: ['React', 'Redux Toolkit', 'Material UI', 'Spring Boot', 'Spring Security', 'JWT', 'JPA / Hibernate', 'Flyway', 'PostgreSQL'],
+    live: 'https://hanumanth-ems.vercel.app',
     github: 'https://github.com/Hanumanth-Raghavendra/EMS_Full_Stack',
+    deployNote: 'Deployed: React on Vercel, Spring Boot API on Render, PostgreSQL on Neon',
     objective: 'Bring an entire HR department into one secure app.',
   },
 ];
