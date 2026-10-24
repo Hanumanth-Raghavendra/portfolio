@@ -48,7 +48,8 @@ export const projects = [
       'Orchestrating five browser and AI technologies, and managing speech state (listening, thinking, speaking, running) so the app never talks over itself or listens to its own voice.',
     stack: ['React', 'Node.js', 'Gemini API', 'Web Speech API', 'Web Audio API', 'Pyodide'],
     live: 'https://blindcoder.vercel.app',
-    sourceNote: 'Source available on request',
+    github: 'https://github.com/Hanumanth-Raghavendra/blindcoder-frontend',
+    githubBackend: 'https://github.com/Hanumanth-Raghavendra/blindcoder-backend',
     // anime-side flavour
     objective: 'Build a coding environment people can use without seeing the screen.',
   },

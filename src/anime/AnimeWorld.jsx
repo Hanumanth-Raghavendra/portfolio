@@ -409,9 +409,11 @@ function Quests() {
                   <a className="a-btn a-btn-cyan" href={p.live} target="_blank" rel="noreferrer">Live demo <External /></a>
                 )}
                 {p.github && (
-                  <a className="a-btn a-btn-paper" href={p.github} target="_blank" rel="noreferrer">GitHub <External /></a>
+                  <a className="a-btn a-btn-paper" href={p.github} target="_blank" rel="noreferrer">{p.githubBackend ? 'Frontend' : 'GitHub'} <External /></a>
                 )}
-                {p.sourceNote && <span className="quest-note">Source on request</span>}
+                {p.githubBackend && (
+                  <a className="a-btn a-btn-paper" href={p.githubBackend} target="_blank" rel="noreferrer">Backend <External /></a>
+                )}
               </div>
             </article>
           ))}
@@ -452,8 +454,8 @@ function Quests() {
             </div>
             <div className="quest-actions">
               {active.live && <a className="a-btn a-btn-cyan" href={active.live} target="_blank" rel="noreferrer">Live demo <External /></a>}
-              {active.github && <a className="a-btn a-btn-paper" href={active.github} target="_blank" rel="noreferrer">GitHub <External /></a>}
-              {active.sourceNote && <span className="quest-note">{active.sourceNote}</span>}
+              {active.github && <a className="a-btn a-btn-paper" href={active.github} target="_blank" rel="noreferrer">{active.githubBackend ? 'Frontend' : 'GitHub'} <External /></a>}
+              {active.githubBackend && <a className="a-btn a-btn-paper" href={active.githubBackend} target="_blank" rel="noreferrer">Backend <External /></a>}
             </div>
           </div>
         )}

@@ -306,7 +306,12 @@ function Projects() {
               <a className="btn btn-primary btn-sm" href={bc.live} target="_blank" rel="noreferrer">
                 Live demo <External />
               </a>
-              <span className="muted-note">{bc.sourceNote}</span>
+              <a className="btn btn-ghost btn-sm" href={bc.github} target="_blank" rel="noreferrer">
+                Frontend repo <External />
+              </a>
+              <a className="btn btn-ghost btn-sm" href={bc.githubBackend} target="_blank" rel="noreferrer">
+                Backend repo <External />
+              </a>
             </div>
           </article>
 
