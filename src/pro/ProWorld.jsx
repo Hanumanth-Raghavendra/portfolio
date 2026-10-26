@@ -349,6 +349,7 @@ function Projects() {
               <a className="btn btn-ghost btn-sm" href={ems.github} target="_blank" rel="noreferrer">
                 View on GitHub <External />
               </a>
+              <span className="muted-note">{ems.demoNote}</span>
             </div>
           </article>
         </div>

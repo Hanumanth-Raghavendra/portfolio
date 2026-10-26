@@ -451,6 +451,7 @@ function Quests() {
               <span className="quest-label">GEAR USED</span>
               <p>{active.stack.join(' · ')}</p>
               {active.deployNote && <p className="quest-note">{active.deployNote}</p>}
+              {active.demoNote && <p className="quest-note">{active.demoNote}</p>}
             </div>
             <div className="quest-actions">
               {active.live && <a className="a-btn a-btn-cyan" href={active.live} target="_blank" rel="noreferrer">Live demo <External /></a>}

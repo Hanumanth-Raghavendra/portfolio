@@ -76,6 +76,7 @@ export const projects = [
     stack: ['React', 'Redux Toolkit', 'Material UI', 'Spring Boot', 'Spring Security', 'JWT', 'JPA / Hibernate', 'Flyway', 'PostgreSQL'],
     live: 'https://hanumanth-ems.vercel.app',
     github: 'https://github.com/Hanumanth-Raghavendra/EMS_Full_Stack',
+    demoNote: 'Demo logins are listed on the sign-in page (password Demo@12345)',
     deployNote: 'Deployed: React on Vercel, Spring Boot API on Render, PostgreSQL on Neon',
     objective: 'Bring an entire HR department into one secure app.',
   },
