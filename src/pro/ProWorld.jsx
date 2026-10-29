@@ -285,7 +285,7 @@ function Skills() {
 
 // ── projects ────────────────────────────────────────────────
 function Projects() {
-  const [bc, ems] = projects;
+  const [bc, ...archProjects] = projects;
   return (
     <section id="projects" className="band">
       <div className="wrap">
@@ -315,43 +315,45 @@ function Projects() {
             </div>
           </article>
 
-          <article className="project">
-            <div className="arch">
-              <p className="arch-label">Architecture</p>
-              <div className="arch-flow">
-                {ems.architecture.map((n, i) => (
-                  <div key={n.name} className="arch-step">
-                    <div className={`arch-node ${n.main ? 'is-main' : ''}`}>
-                      <strong>{n.name}</strong>
-                      <span>{n.detail}</span>
-                      {n.host && <span className="arch-host">{n.host}</span>}
+          {archProjects.map((p) => (
+            <article key={p.id} className="project">
+              <div className="arch">
+                <p className="arch-label">Architecture</p>
+                <div className="arch-flow">
+                  {p.architecture.map((n, i) => (
+                    <div key={n.name} className="arch-step">
+                      <div className={`arch-node ${n.main ? 'is-main' : ''}`}>
+                        <strong>{n.name}</strong>
+                        <span>{n.detail}</span>
+                        {n.host && <span className="arch-host">{n.host}</span>}
+                      </div>
+                      {i < p.architecture.length - 1 && <span className="arch-arrow" aria-hidden="true">→</span>}
                     </div>
-                    {i < ems.architecture.length - 1 && <span className="arch-arrow" aria-hidden="true">→</span>}
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="arch-stats">
+                  {p.stats.map((s) => (
+                    <div key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>
+                  ))}
+                </div>
               </div>
-              <div className="arch-stats">
-                {ems.stats.map((s) => (
-                  <div key={s.label}><strong>{s.value}</strong><span>{s.label}</span></div>
-                ))}
+              <div className="project-head">
+                <h3>{p.name}</h3>
+                <p>{p.oneLiner}</p>
               </div>
-            </div>
-            <div className="project-head">
-              <h3>{ems.name}</h3>
-              <p>{ems.oneLiner}</p>
-            </div>
-            <ul className="tags tags-outline">{ems.modules.map((m) => <li key={m}>{m}</li>)}</ul>
-            <Challenge text={ems.challenge} />
-            <div className="project-links">
-              <a className="btn btn-primary btn-sm" href={ems.live} target="_blank" rel="noreferrer">
-                Live demo <External />
-              </a>
-              <a className="btn btn-ghost btn-sm" href={ems.github} target="_blank" rel="noreferrer">
-                View on GitHub <External />
-              </a>
-              <span className="muted-note">{ems.demoNote}</span>
-            </div>
-          </article>
+              <ul className="tags tags-outline">{p.modules.map((m) => <li key={m}>{m}</li>)}</ul>
+              <Challenge text={p.challenge} />
+              <div className="project-links">
+                <a className="btn btn-primary btn-sm" href={p.live} target="_blank" rel="noreferrer">
+                  Live demo <External />
+                </a>
+                <a className="btn btn-ghost btn-sm" href={p.github} target="_blank" rel="noreferrer">
+                  View on GitHub <External />
+                </a>
+                <span className="muted-note">{p.demoNote}</span>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>

@@ -17,16 +17,16 @@ export const profile = {
   resume: './resume/Hanumanth_Raghavendra_Resume.pdf',
   about: [
     "I'm Hanumanth, a full-stack developer who likes building things that matter beyond the demo. I work mostly with Java, Spring Boot and React, and my favourite build so far is Blind Coder, an AI coding environment that visually impaired developers can use entirely by voice.",
-    'Currently interning at Winfo Solutions and learning Azure. Off the clock: chess, manga, anime, and cooking.',
+    'My biggest build is Trackly, a productivity system with two backend services, an Android app and a full CI pipeline. Currently interning at Winfo Solutions and learning Azure. Off the clock: chess, manga, anime, and cooking.',
   ],
 };
 
 export const skills = [
-  { group: 'Languages', items: ['Java', 'JavaScript', 'Python', 'SQL', 'C'] },
-  { group: 'Frontend', items: ['React', 'Redux Toolkit', 'Material UI', 'HTML5', 'CSS3'] },
-  { group: 'Backend', items: ['Spring Boot', 'Spring Security', 'JPA / Hibernate', 'Node.js', 'REST APIs', 'JWT'] },
+  { group: 'Languages', items: ['Java', 'JavaScript', 'TypeScript', 'Python', 'SQL', 'C'] },
+  { group: 'Frontend', items: ['React', 'Redux Toolkit', 'Material UI', 'Tailwind CSS', 'HTML5', 'CSS3'] },
+  { group: 'Backend', items: ['Spring Boot', 'Spring Security', 'JPA / Hibernate', 'Node.js', 'REST APIs', 'JWT', 'Socket.IO'] },
   { group: 'Database', items: ['PostgreSQL', 'Flyway'] },
-  { group: 'Cloud & Tools', items: ['Docker', 'AWS', 'Git / GitHub', 'Maven', 'Vercel', 'Render', 'Neon'] },
+  { group: 'Cloud & Tools', items: ['Docker', 'AWS', 'Git / GitHub', 'GitHub Actions', 'Maven', 'Playwright', 'Vercel', 'Render', 'Neon'] },
   { group: 'AI & Voice', items: ['Gemini API', 'Web Speech API'] },
   { group: 'Learning', items: ['Azure'] },
 ];
@@ -80,6 +80,34 @@ export const projects = [
     deployNote: 'Deployed: React on Vercel, Spring Boot API on Render, PostgreSQL on Neon',
     objective: 'Bring an entire HR department into one secure app.',
   },
+  {
+    id: 'trackly',
+    name: 'Trackly · Behaviour-Based Productivity System',
+    shortName: 'Trackly',
+    oneLiner:
+      'Tasks, habits and focus sessions feed one explainable daily score, with coach cards and a weekly review. Two backend services joined by a transactional outbox, plus an installable Android app.',
+    problem: 'Turns what you actually do each day (tasks, habits, focus time) into a score you can understand, not just a to-do list.',
+    architecture: [
+      { name: 'React + TypeScript', detail: 'Vite · Tailwind · PWA', host: 'Hosted on Vercel' },
+      { name: 'Spring Boot API', detail: 'Java 21 · JWT · Flyway', host: 'Hosted on Render', main: true },
+      { name: 'PostgreSQL', detail: 'Transactional outbox', host: 'Hosted on Neon' },
+      { name: 'Node insights', detail: 'Scores · Socket.IO live sync', host: 'Hosted on Render' },
+    ],
+    stats: [
+      { value: '2', label: 'backend services' },
+      { value: '120+', label: 'automated tests' },
+      { value: '5', label: 'CI jobs' },
+    ],
+    modules: ['Tasks', 'Habits', 'Focus timer', 'Daily score', 'Coach cards', 'Weekly review', 'XP & achievements', 'Analytics'],
+    challenge:
+      'Rotating refresh tokens with theft detection logged real users out when a response was lost or two tabs refreshed at once. The end-to-end tests caught it. Fixed with a 20-second grace window on the server and a cross-tab lock (Web Locks API) in the browser.',
+    stack: ['React', 'TypeScript', 'Tailwind CSS', 'Spring Boot', 'Spring Security', 'JWT', 'Node.js', 'Socket.IO', 'PostgreSQL', 'Flyway', 'Docker', 'GitHub Actions', 'Playwright', 'Capacitor'],
+    live: 'https://trackly-hr.vercel.app',
+    github: 'https://github.com/Hanumanth-Raghavendra/trackly',
+    demoNote: 'Free servers sleep when idle, so the first load can take about a minute. Use "Try the live demo" on the landing page.',
+    deployNote: 'Deployed: React on Vercel, Spring Boot and Node services on Render, PostgreSQL on Neon',
+    objective: 'Turn tasks, habits and focus time into one daily score you can trust.',
+  },
 ];
 
 export const journey = [
@@ -124,7 +152,7 @@ export const now = {
   items: [
     { label: 'Working', text: 'Interning at Winfo Solutions' },
     { label: 'Learning', text: 'Azure' },
-    { label: 'Building', text: "This site (you're looking at it)" },
+    { label: 'Building', text: "Trackly, and this site (you're looking at it)" },
     { label: 'Playing', text: 'Chess' },
   ],
 };
@@ -136,15 +164,15 @@ export const status = {
   level: 22,
   sideQuests: ['Chess', 'Cooking', 'Manhwa & Manhua', 'Manga', 'Anime'],
   arena: 'Battle royale & FPS veteran',
-  equipped: ['Java', 'Spring Boot', 'Spring Security', 'JPA / Hibernate', 'JWT', 'React', 'Redux Toolkit', 'Material UI', 'Node.js', 'PostgreSQL', 'Docker', 'AWS', 'Gemini API', 'Web Speech API', 'Python', 'C'],
+  equipped: ['Java', 'Spring Boot', 'Spring Security', 'JPA / Hibernate', 'JWT', 'React', 'Redux Toolkit', 'Material UI', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker', 'AWS', 'Gemini API', 'Web Speech API', 'Python', 'C'],
 };
 
 export const skillTree = [
   { branch: 'Java path', nodes: ['Java', 'Spring Boot', 'Spring Security + JWT', 'JPA / Hibernate'] },
-  { branch: 'Web path', nodes: ['JavaScript', 'React', 'Redux Toolkit · Material UI'] },
+  { branch: 'Web path', nodes: ['JavaScript', 'TypeScript', 'React', 'Redux Toolkit · Material UI'] },
   { branch: 'Server', nodes: ['Node.js', 'REST APIs'] },
   { branch: 'Data', nodes: ['SQL', 'PostgreSQL', 'Flyway'] },
-  { branch: 'Cloud', nodes: ['Docker · AWS', 'Azure'], learning: ['Azure'] },
+  { branch: 'Cloud', nodes: ['Docker · AWS', 'GitHub Actions CI', 'Azure'], learning: ['Azure'] },
   { branch: 'AI & Voice', nodes: ['Web Speech API', 'Gemini API'] },
 ];
 
@@ -157,7 +185,7 @@ export const dialogue = [
 // hint = what the locked badge says; secret ones stay "???" until found
 export const achievementList = [
   { id: 'portal', title: 'Found the other side', hint: "Get isekai'd" },
-  { id: 'quests', title: 'Read every quest', hint: 'Open both quest logs' },
+  { id: 'quests', title: 'Read every quest', hint: 'Open every quest log' },
   { id: 'resume', title: 'Legendary drop', hint: 'Grab the resume' },
   { id: 'party', title: 'Party formed', hint: 'Send a party invite' },
   { id: 'voice', title: 'Spoke the incantation', hint: 'Use a voice command' },
